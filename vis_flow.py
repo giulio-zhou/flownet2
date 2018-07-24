@@ -1,4 +1,5 @@
 import cv2
+import h5py
 import numpy as np
 import skimage.io as skio
 import skvideo.io
@@ -13,9 +14,9 @@ def vis(flow):
     rgb_img = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
     return rgb_img
 
-flow = np.load(sys.argv[1])
+flow = h5py.File(sys.argv[1], 'r')['data']
 if len(flow) == 1:
-    skio.imsave(sys.argv[2], vis(flow))
+    skio.imsave(sys.argv[2], vis(flow[0]))
 else:
     vwriter = skvideo.io.FFmpegWriter(
         sys.argv[2], outputdict={'-pix_fmt': 'yuv420p'})
