@@ -68,9 +68,10 @@ net = caffe.Net(tmp.name, args.caffemodel, caffe.TEST)
 imgs = [data[0]]
 output_flow = []
 hdf5_file = h5py.File(args.outputpath, 'w')
-hdf5_file.create_dataset('data', [args.num_frames - 1, height, width, 2], 'f2')
-for j in range(0, args.num_frames - 1, args.batchsize):
-    start, end = j, min(j + args.batchsize, args.num_frames - 1)
+hdf5_file.create_dataset('data', [args.num_frames, height, width, 2], 'f2')
+for j in range(1, args.num_frames, args.batchsize):
+    start, end = j, min(j + args.batchsize, args.num_frames)
+    print(start, end)
     imgs = [imgs[-1]] + list(data[start:end])
     if len(imgs) < args.batchsize + 1:
         imgs = imgs + [imgs[-1]] * (args.batchsize + 1 - len(imgs))
@@ -82,4 +83,4 @@ for j in range(0, args.num_frames - 1, args.batchsize):
     blob = net.blobs['predict_flow_final'].data.transpose(0, 2, 3, 1)
     blob = blob[:end-start]
     hdf5_file['data'][j:j+end-start] = np.copy(blob).astype(np.float16)
-    print(j, args.num_frames)
+    # print(j, args.num_frames)
